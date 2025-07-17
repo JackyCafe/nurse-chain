@@ -1,7 +1,10 @@
 package com.blockchain.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -9,14 +12,19 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter; // 使用 Getter 替代 Data
 import lombok.NoArgsConstructor;
+import lombok.Setter; // 使用 Setter 替代 Data
+import lombok.ToString;
 
 @Entity
 @Table(name = "hospital")
-@Data
+@Getter // 替代 @Data
+@Setter // 替代 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = { "nurseInfo" }) // 修正：排除關聯實體以避免循環
+// @EqualsAndHashCode(exclude = { "nurseInfo" }) // 關鍵修正：排除關聯實體
 public class Hospital {
 
     @Id
@@ -24,20 +32,19 @@ public class Hospital {
     private Long id;
 
     @Column(name = "dept", nullable = false)
-    String dept;
+    private String dept;
 
     @Column(name = "dept_id", nullable = false)
-    int deptId;
+    private int deptId;
 
     @Column(name = "name", nullable = false)
-    String name;
+    private String name;
 
-    @Column(name = "vertified", nullable = false)
-    boolean vertified;
+    @Column(name = "verified", nullable = false)
+    private boolean verified;
 
-    @OneToOne
-    @JoinColumn(name = "nurse_id", referencedColumnName = "id", nullable = false) // hospital 表中的 nurse_id 欄位參考
-                                                                                  // nurse_info 表的 id
-    private NurseInfo nurseInfo; // 這裡的屬性名稱將用於 NurseInfo 中的 mappedBy
-
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "nurse_id", referencedColumnName = "id", nullable = false)
+    @JsonBackReference // 表示這是關係的「反向」部分，不應序列化
+    private NurseInfo nurseInfo;
 }

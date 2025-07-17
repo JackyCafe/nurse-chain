@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,24 +16,27 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "subject")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = { "nurseCertifications" })
+// @EqualsAndHashCode(exclude = { "nurseCertifications" }) // 關鍵修正：排除關聯集合
 public class Subject {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "category", nullable = false)
     private String category;
-
-    @Column(name = "subject", nullable = false)
-    private String subjectName;
 
     @Column(name = "teacher", nullable = false)
     private String teacher;
@@ -45,6 +50,10 @@ public class Subject {
     @Column(name = "points", nullable = false)
     private float points;
 
+    @Column(name = "subject_name", nullable = false)
+    private String subjectName;
+
     @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private Set<NurseCertifications> nurseCertifications = new HashSet<>();
 }

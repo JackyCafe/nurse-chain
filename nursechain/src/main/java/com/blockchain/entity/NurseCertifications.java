@@ -3,7 +3,7 @@ package com.blockchain.entity;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,16 +15,19 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Entity
 @Table(name = "nurse_certification")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@ToString(exclude = { "nurseInfo", "subject" })
+// @EqualsAndHashCode(exclude = { "nurseInfo", "subject" }) // 關鍵修正：排除關聯實體
 public class NurseCertifications {
 
     @Id
@@ -34,16 +37,15 @@ public class NurseCertifications {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "nurse_id", referencedColumnName = "id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
-    private NurseInfo nurseInfo; // 指的是 NurseInfo 的 id
+    @JsonBackReference
+    private NurseInfo nurseInfo;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "subject_id", referencedColumnName = "id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
-    private Subject subject; // 指的是 Subject 的 id
+    @JsonBackReference
+    private Subject subject;
 
-    // 其他欄位，例如 end_time, points, start_time, subject_id 等
     @Column(name = "end_time")
     private java.time.LocalDateTime endTime;
 
@@ -52,5 +54,4 @@ public class NurseCertifications {
 
     @Column(name = "start_time")
     private java.time.LocalDateTime startTime;
-
 }
