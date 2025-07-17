@@ -1,5 +1,4 @@
-package com.blockchain.controller.entity;
-
+package com.blockchain.entity;
 import java.util.HashSet;
 import java.util.Set;
 

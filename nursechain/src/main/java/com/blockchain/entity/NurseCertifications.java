@@ -1,4 +1,4 @@
-package com.blockchain.controller.entity;
+package com.blockchain.entity;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;

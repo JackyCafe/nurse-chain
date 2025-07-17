@@ -1,4 +1,4 @@
-package com.blockchain.controller.entity;
+package com.blockchain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
