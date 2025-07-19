@@ -18,6 +18,7 @@ public class NurseCertificationResponseDTO {
     private LocalDateTime endTime;
     private Float points;
     private String category;
+    private String unit;
 
     // Constructors, Getters, Setters (可以使用 Lombok 的 @Getter, @Setter,
     // @NoArgsConstructor, @AllArgsConstructor)
@@ -35,6 +36,9 @@ public class NurseCertificationResponseDTO {
         String subjectName = Optional.ofNullable(entity.getSubject())
                 .map(Subject::getSubjectName) // <-- 這裡是關鍵
                 .orElse("Unknown Subject");
+        String unit = Optional.ofNullable(entity.getSubject())
+                .map(Subject::getUnit)
+                .orElse("Unknown unit");
 
         return new NurseCertificationResponseDTO(
                 entity.getId(),
@@ -45,11 +49,44 @@ public class NurseCertificationResponseDTO {
                 entity.getEndTime(),
                 entity.getPoints(),
                 category,
-                subjectName);
+                subjectName,
+                unit);
+    }
+
+    public static NurseCertificationResponseDTO fromEntity(NurseCertifications entity) {
+        String nurseName = Optional.ofNullable(entity.getNurseInfo())
+                .map(NurseInfo::getName)
+                .orElse("Unknown Nurse"); // 這裡的字串應該是 "Unknown Nurse"
+
+        // 從 Subject 實體中獲取 category, subjectName, 和 unit
+        String category = Optional.ofNullable(entity.getSubject())
+                .map(Subject::getCategory)
+                .orElse("Unknown Subject"); // 這裡的字串應該是 "Unknown Subject"
+
+        String subjectName = Optional.ofNullable(entity.getSubject())
+                .map(Subject::getSubjectName)
+                .orElse("Unknown Subject"); // 這裡的字串應該是 "Unknown Subject"
+
+        String unit = Optional.ofNullable(entity.getSubject())
+                .map(Subject::getUnit)
+                .orElse("Unknown unit"); // 這裡的字串應該是 "Unknown unit"
+
+        return new NurseCertificationResponseDTO(
+                entity.getId(),
+                entity.getNurseInfo() != null ? entity.getNurseInfo().getId() : null, // 避免空指針
+                nurseName,
+                entity.getSubject() != null ? entity.getSubject().getId() : null, // 避免空指針
+                entity.getStartTime(),
+                entity.getEndTime(),
+                entity.getPoints(),
+                category,
+                subjectName, // 傳入 subjectName
+                unit); // 傳入 unit
     }
 
     public NurseCertificationResponseDTO(Long id, Long nurseId, String nurseName, Long subjectId,
-            LocalDateTime startTime, LocalDateTime endTime, Float points, String category, String subject) {
+            LocalDateTime startTime, LocalDateTime endTime, Float points, String category, String subject,
+            String unit) {
         this.id = id;
         this.nurseId = nurseId;
         this.nurseName = nurseName;
@@ -59,6 +96,7 @@ public class NurseCertificationResponseDTO {
         this.points = points;
         this.category = category;
         this.subjectName = subject;
+        this.unit = unit;
     }
 
     public Long getId() {
@@ -131,5 +169,13 @@ public class NurseCertificationResponseDTO {
 
     public String getCategory() {
         return this.category;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public String getUnit() {
+        return this.unit;
     }
 }

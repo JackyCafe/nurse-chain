@@ -12,4 +12,9 @@ public class HelloController {
     public String hello() {
         return "hello"; // This will resolve to a view named "hello"
     }
+
+    @GetMapping("/nursecertifications")
+    public String nurse_certification() {
+        return "nurseCertifications";
+    }
 }

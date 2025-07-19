@@ -43,7 +43,7 @@ public class NurseCertifications {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "subject_id", referencedColumnName = "id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonBackReference
+    @JsonBackReference("subject-certifications")
     private Subject subject;
 
     @Column(name = "end_time")

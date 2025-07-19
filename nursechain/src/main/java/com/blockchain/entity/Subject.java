@@ -50,10 +50,13 @@ public class Subject {
     @Column(name = "points", nullable = false)
     private float points;
 
+    @Column(name = "units", nullable = false)
+    private String unit;
+
     @Column(name = "subject_name", nullable = false)
     private String subjectName;
 
     @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonManagedReference("subject-certifications")
     private Set<NurseCertifications> nurseCertifications = new HashSet<>();
 }
