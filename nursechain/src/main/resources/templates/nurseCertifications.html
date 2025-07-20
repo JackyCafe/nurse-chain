@@ -9,9 +9,9 @@
 </head>
 <body>
     <div class="container">
-        <h1>護士證書管理</h1>
+        <h1>證書管理</h1>
 
-        <h2>新增/編輯護士證書</h2>
+        <h2>新增/編輯證書</h2>
         <form id="certificationForm">
             <input type="hidden" id="certificationId">
             <label for="nurseId">護士ID:</label>
@@ -42,10 +42,18 @@
             <button type="submit" id="submitBtn">新增證書</button>
         </form>
         <div id="message"></div>
+        <div class="block-details">
+    <h3>區塊鏈證書資訊</h3>
+    <p><strong>區塊哈希 (BlockHash):</strong> <span id="displayBlockHash"></span></p>
+    <p><strong>Merkle Root:</strong> <span id="displayMerkleRoot"></span></p>
+    <p><strong>時間戳 (Timestamp):</strong> <span id="displayTimestamp"></span></p>
+    <p><strong>隨機數 (Nonce):</strong> <span id="displayNonce"></span></p>
+    </div>
     </div>
 
     <div class="container">
-        <h2>護士證書列表</h2>
+        <h2>證書列表</h2>
+      
         <div id="loading">載入中...</div>
         <table id="certificationsTable">
             <thead>
@@ -66,8 +74,14 @@
                 </tbody>
         </table>
     </div>
-
+  <button id="toBlockchainAllBtn" 
+        style="margin-top: 20px; padding: 10px 20px; font-size: 16px; 
+        background-color: #007bff; color: white; border: none; border-radius: 
+        5px; cursor: pointer;">
+    一鍵上鏈
+</button>
        <script src="/js/script.js"></script>
 
 </body>
+
 </html>

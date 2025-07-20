@@ -1,9 +1,11 @@
 const BASE_API_URL = 'http://120.110.115.123:8081';
 const apiUrl = `${BASE_API_URL}/api/nursecertifications`;
 const subjectApiUrl = `${BASE_API_URL}/api/subjects`; // 獲取所有科目數據
+const blockchainApiUrl = `${BASE_API_URL}/api/blockchain/certify`; // 區塊鏈 Controller 端點
+
 const tableBody = document.querySelector('#certificationsTable tbody');
 const loadingDiv = document.getElementById('loading');
-const messageDiv = document.getElementById('message');
+const messageDiv = document.getElementById('message'); // 主要訊息區域
 const certificationForm = document.getElementById('certificationForm');
 const submitBtn = document.getElementById('submitBtn');
 const certificationIdInput = document.getElementById('certificationId');
@@ -17,14 +19,38 @@ const pointsInput = document.getElementById('points'); // 積分輸入框，用�
 let allSubjects = []; // 儲存所有科目數據
 
 // 輔助函數：顯示訊息
-function showMessage(msg, type = 'success') {
-    messageDiv.textContent = msg;
-    messageDiv.className = type;
-    setTimeout(() => {
-        messageDiv.textContent = '';
-        messageDiv.className = '';
-    }, 300000);
+// msg: 訊息內容
+// type: 訊息類型 ('success', 'error', 'info')
+// append: 是否追加訊息 (true) 或替換訊息 (false)
+// autoClearDuration: 自動清除訊息的時間 (毫秒)。0 表示不自動清除。
+function showMessage(msg, type = 'success', append = false, autoClearDuration = 3000) {
+    const p = document.createElement('p'); // 創建一個新的段落元素來顯示訊息
+    p.textContent = msg;
+    p.className = type; // 添加類型類別用於樣式
+
+    if (append) {
+        messageDiv.appendChild(p); // 追加訊息
+    } else {
+        messageDiv.innerHTML = ''; // 清空舊訊息
+        messageDiv.appendChild(p); // 替換訊息
+    }
+    messageDiv.style.display = 'block'; // 確保訊息區域可見
+
+    if (autoClearDuration > 0) {
+        setTimeout(() => {
+            // 只清除本條訊息，如果父容器有多條訊息則需要更複雜的清除邏輯
+            // 為了簡化，如果 autoClearDuration > 0，我們假設訊息是替換而不是追加的
+            if (!append) {
+                messageDiv.innerHTML = '';
+                messageDiv.style.display = 'none';
+            } else {
+                // 如果是追加的訊息且需要自動清除，可以考慮移除單獨的 <p> 元素
+                p.remove();
+            }
+        }, autoClearDuration);
+    }
 }
+
 
 // 輔助函數：清除表單
 function clearForm() {
@@ -38,6 +64,9 @@ function clearForm() {
     pointsInput.value = ''; // 清空積分
     submitBtn.textContent = '新增證書';
     submitBtn.style.backgroundColor = '#28a745';
+    // 不清除 messageDiv
+    // messageDiv.innerHTML = '';
+    // messageDiv.style.display = 'none';
 }
 
 // 載入所有科目數據 (包括 category 和 unit)
@@ -122,6 +151,8 @@ async function loadCertifications() {
             data.forEach(cert => {
                 const row = tableBody.insertRow();
                 row.setAttribute('data-id', cert.id);
+                // 新增 data-certification-id 屬性以便「一鍵上鏈」功能使用
+                row.setAttribute('data-certification-id', cert.id);
                 row.insertCell().textContent = cert.id;
                 row.insertCell().textContent = cert.nurseId;
                 row.insertCell().textContent = cert.nurseName;
@@ -145,11 +176,11 @@ async function loadCertifications() {
                 deleteButton.onclick = () => deleteCertification(cert.id);
                 actionsCell.appendChild(deleteButton);
 
-                const toBlockChain = document.createElement('button');
-                toBlockChain.textContent = '上鏈';
-                toBlockChain.className = 'btn-toBlockChain';
-                toBlockChain.onclick = () => toBlockchain(cert.id);
-                actionsCell.appendChild(toBlockChain);
+                const toBlockChainButton = document.createElement('button'); // 修改變數名避免衝突
+                toBlockChainButton.textContent = '上鏈';
+                toBlockChainButton.className = 'btn-toBlockChain'; // 保持 class 名稱一致
+                toBlockChainButton.onclick = () => toBlockchain(cert.id, true); // 單獨上鏈時傳入 true，表示重定向
+                actionsCell.appendChild(toBlockChainButton);
             });
         } else {
             const row = tableBody.insertRow();
@@ -177,7 +208,7 @@ certificationForm.addEventListener('submit', async function (event) {
     const points = document.getElementById('points').value;
 
     if (!selectedSubjectId) {
-        showMessage('請選擇一個科目！', 'error');
+        showMessage('請選擇一個科目！', 'error'); // 替換顯示
         return;
     }
 
@@ -191,7 +222,7 @@ certificationForm.addEventListener('submit', async function (event) {
 
     let response;
     try {
-        console.log(certificationData)
+        console.log(certificationData);
         if (id) {
             response = await fetch(`${apiUrl}/${id}`, {
                 method: 'PUT',
@@ -199,7 +230,7 @@ certificationForm.addEventListener('submit', async function (event) {
                 body: JSON.stringify(certificationData)
             });
             if (response.ok) {
-                showMessage('證書更新成功！');
+                showMessage('證書更新成功！'); // 替換顯示
             } else {
                 throw new Error(`更新失敗: ${response.statusText}`);
             }
@@ -210,7 +241,7 @@ certificationForm.addEventListener('submit', async function (event) {
                 body: JSON.stringify(certificationData)
             });
             if (response.ok) {
-                showMessage('證書新增成功！');
+                showMessage('證書新增成功！'); // 替換顯示
             } else {
                 throw new Error(`新增失敗: ${response.statusText}`);
             }
@@ -219,7 +250,7 @@ certificationForm.addEventListener('submit', async function (event) {
         loadCertifications();
     } catch (error) {
         console.error('操作失敗:', error);
-        showMessage(error.message, 'error');
+        showMessage(error.message, 'error'); // 替換顯示
     }
 });
 
@@ -246,7 +277,7 @@ async function editCertification(cert) {
     } else {
         // 如果找不到科目，則清空相關欄位
         clearForm();
-        showMessage('編輯的科目不存在，請重新選擇。', 'error');
+        showMessage('編輯的科目不存在，請重新選擇。', 'error'); // 替換顯示
     }
 
     document.getElementById('startTime').value = cert.startTime ? new Date(cert.startTime).toISOString().slice(0, 16) : '';
@@ -265,73 +296,154 @@ async function deleteCertification(id) {
                 method: 'DELETE'
             });
             if (response.ok) {
-                showMessage('證書刪除成功！');
+                showMessage('證書刪除成功！'); // 替換顯示
                 loadCertifications();
             } else {
                 throw new Error(`刪除失敗: ${response.statusText}`);
             }
         } catch (error) {
             console.error('刪除操作失敗:', error);
-            showMessage(error.message, 'error');
+            showMessage(error.message, 'error'); // 替換顯示
         }
     }
 }
 
-// 假設的 toBlockchain 函數 (保持不變)
-async function toBlockchain(certificationId) {
+/**
+ * 將單個證書數據上鏈到區塊鏈
+ * @param {number} certificationId - 要上鏈的證書 ID
+ * @param {boolean} [redirectAfterCompletion=false] - 是否在成功後重定向到區塊鏈模擬頁面
+ * @returns {Promise<object|null>} - 返回一個 Promise，解析為成功響應物件或 null (失敗)
+ */
+async function toBlockchain(certificationId, redirectAfterCompletion = false) {
     if (!certificationId) {
-        showMessage('無效的證書 ID！', 'error');
-        return;
+        if (redirectAfterCompletion) { // 只有單獨操作才顯示這個錯誤
+            showMessage('無效的證書 ID！', 'error');
+        }
+        return null;
     }
-    showMessage(`正在處理 ID ${certificationId} 的證書上鏈...`, 'info');
+
     const requestBody = {
         certificationId: certificationId
     };
+
     try {
-        // 使用 fetch API 向您的 Blockchain Controller 發送請求
-        // 您可以選擇使用 GET 請求 (傳遞路徑變數或查詢參數) 或 POST 請求 (傳遞請求體)
-        // 這裡示範使用 POST 請求，並在請求體中傳遞 JSON 資料
-
-        const blockchainApiUrl = `${BASE_API_URL}/api/blockchain/certify`; // 請替換為您的實際區塊鏈 Controller 端點
-
         const response = await fetch(blockchainApiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(requestBody) // 將證書ID作為 JSON 傳遞
+            body: JSON.stringify(requestBody)
         });
 
         if (!response.ok) {
-            // 處理非 2xx 狀態碼的響應
-            const errorText = await response.json();
-            throw new Error(`上鏈失敗: ${response.status} - ${errorText}`);
+            const errorData = await response.json();
+            throw new Error(`上鏈失敗: ${response.status} - ${errorData.message || JSON.stringify(errorData)}`);
         }
 
-        const result = await response.json(); // 假設 Controller 會返回 JSON 響應
-        showMessage(`證書 ID ${certificationId} 上鏈成功！交易 Hash: ${result.blockHash},merkleRoot=${result.merkleRoot},nonce=${result.nonce}`, 'success');
-        /* 上鏈成功 視覺化
-        */
-        const queryParams = new URLSearchParams();
-        if (result.timestamp) queryParams.append('timestamp', result.timestamp);
-        if (result.blockHash) queryParams.append('blockHash', result.blockHash);
-        if (result.merkleRoot) queryParams.append('merkleRoot', result.merkleRoot);
-        if (result.nonce) queryParams.append('nonce', result.nonce);
-        // const blockchainSimulationUrl = `${BASE_API_URL}/blockchain-simulation.html?${queryParams.toString()}`
-        // window.location.href = blockchainSimulationUrl;
-        console.log('上鏈成功響應:', result);
+        const result = await response.json();
+        console.log(`證書 ID ${certificationId} 上鏈成功響應:`, result);
 
-        // 您可能需要重新載入證書列表或更新UI以反映上鏈狀態
+        if (redirectAfterCompletion) {
+            // 單獨上鏈成功時才重定向並清除原訊息
+            showMessage(`證書 ID ${certificationId} 上鏈成功！區塊哈希: ${result.blockHash}`, 'success');
+            const queryParams = new URLSearchParams();
+            if (result.timestamp) queryParams.append('timestamp', result.timestamp);
+            if (result.blockHash) queryParams.append('blockHash', result.blockHash);
+            if (result.merkleRoot) queryParams.append('merkleRoot', result.merkleRoot);
+            if (result.nonce) queryParams.append('nonce', result.nonce);
 
+            // 請替換為您的區塊鏈模擬網站的實際 URL
+            const blockchainSimulationUrl = `${BASE_API_URL}/blockchain-simulation.html?${queryParams.toString()}`;
+            window.location.href = blockchainSimulationUrl;
+        }
+        return result; // 返回成功結果
     } catch (error) {
         console.error('上鏈操作失敗:', error);
-        showMessage(`上鏈失敗: ${error.message}`, 'error');
+        if (redirectAfterCompletion) { // 只有單獨操作才顯示這個錯誤
+            showMessage(`上鏈失敗: ${error.message}`, 'error');
+        }
+        return null; // 返回 null 表示失敗
+    }
+}
+
+/**
+ * 實現「一鍵上鏈」所有證書的功能，依序處理
+ */
+async function toBlockchainAllCertifications() {
+    const allCertRows = document.querySelectorAll('#certificationsTable tbody tr[data-certification-id]');
+    if (allCertRows.length === 0) {
+        showMessage('沒有可上鏈的證書。', 'info'); // 替換顯示
+        return;
     }
 
+    // 清空並初始化訊息區域，然後追加總體進度訊息
+    messageDiv.innerHTML = '';
+    showMessage(`開始一鍵上鏈所有 ${allCertRows.length} 筆證書...`, 'info', true, 0); // 持續顯示，不自動清除
+
+    const toBlockchainAllBtn = document.getElementById('toBlockchainAllBtn');
+    toBlockchainAllBtn.disabled = true; // 禁用按鈕防止重複點擊
+
+    let successfulUploads = 0;
+    let failedUploads = 0;
+
+    for (const row of allCertRows) {
+        const certificationId = parseInt(row.dataset.certificationId);
+        if (isNaN(certificationId)) {
+            console.warn('跳過無效的證書 ID 行:', row);
+            continue;
+        }
+
+        // 可以為正在處理的行添加視覺回饋，例如改變背景色
+        row.style.backgroundColor = '#e0f7fa'; // 淺藍色表示處理中
+
+        // 呼叫 toBlockchain 函數，設置 redirectAfterCompletion 為 false
+        const result = await toBlockchain(certificationId, false); // result 會是 object 或 null
+
+        if (result) {
+            successfulUploads++;
+            row.style.backgroundColor = '#e8f5e9'; // 淺綠色表示成功
+            const btn = row.querySelector('.btn-toBlockChain');
+            if (btn) {
+                btn.textContent = '已上鏈';
+                btn.disabled = true;
+                btn.style.backgroundColor = '#4CAF50';
+            }
+            // 追加成功的上鏈資訊
+            showMessage(`ID ${certificationId} 上鏈成功！Hash: ${result.blockHash}, Merkle: ${result.merkleRoot}, Nonce: ${result.nonce}`, 'success', true, 0);
+        } else {
+            failedUploads++;
+            row.style.backgroundColor = '#ffebee'; // 淺紅色表示失敗
+            const btn = row.querySelector('.btn-toBlockChain');
+            if (btn) {
+                btn.textContent = '上鏈失敗';
+                btn.disabled = false; // 失敗的可以考慮允許再次嘗試
+                btn.style.backgroundColor = '#f44336';
+            }
+            // 追加失敗的訊息
+            showMessage(`ID ${certificationId} 上鏈失敗！`, 'error', true, 0);
+        }
+
+        // 移除處理中的背景色，或者保留成功/失敗的顏色
+        // row.style.backgroundColor = ''; 
+
+        // 添加一個小延遲，避免請求過於頻繁
+        await new Promise(resolve => setTimeout(resolve, 500)); // 延遲 500 毫秒
+    }
+
+    // 所有處理完成後的總結訊息
+    showMessage(`所有證書上鏈完成。成功: ${successfulUploads} 筆，失敗: ${failedUploads} 筆。`, 'info', true, 0); // 持續顯示
+    toBlockchainAllBtn.disabled = false; // 重新啟用按鈕
 }
+
 
 // 頁面載入時執行
 document.addEventListener('DOMContentLoaded', async () => {
     await loadAllSubjectsData(); // 先載入所有科目數據（包括類別和名稱）
     await loadCertifications(); // 再載入證書列表
+
+    // 為「一鍵上鏈所有證書」按鈕添加事件監聽器
+    const toBlockchainAllBtn = document.getElementById('toBlockchainAllBtn');
+    if (toBlockchainAllBtn) {
+        toBlockchainAllBtn.addEventListener('click', toBlockchainAllCertifications);
+    }
 });
