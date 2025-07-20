@@ -64,17 +64,21 @@ public class BlockchainService {
         // 4. 執行 PoW (挖礦)，並將區塊添加到區塊鏈中
         System.out.println("Attempting to mine new block for certification ID: " + certificationId);
         Blockchain.addBlock(newBlock); // addBlock 內部會執行 mineBlock
-
+        String blockHash = newBlock.getHash(); // 取得計算後的新區塊哈希
+        String merkleRoot = newBlock.getMerkleRoot(); // 取得計算後的 Merkle Root
+        long timestamp = newBlock.getTimestamp(); // 取得區塊時間戳
+        int nonce = newBlock.getNonce(); // 取得挖礦後的 Nonce
         // 5. 驗證區塊鏈 (可選，但推薦用於測試)
         System.out.println("Is Blockchain Valid? " + Blockchain.isChainValid());
 
         // 6. 返回上鏈結果
         if (Blockchain.isChainValid()) { // 假設鏈有效則上鏈成功
             return new BlockchainCertifyResponseDTO(true, "Certification successfully sent to blockchain.",
-                    newBlock.getHash());
+                    blockHash, merkleRoot, timestamp, nonce);
         } else {
             return new BlockchainCertifyResponseDTO(false,
-                    "Failed to send certification to blockchain. Blockchain invalid.", null);
+                    "Failed to send certification to blockchain. Blockchain invalid.", null, null, 0, 0);
+
         }
 
     }

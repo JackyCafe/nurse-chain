@@ -43,6 +43,7 @@ public class BlockchainController {
             // 調用服務層來處理實際的上鏈邏輯
             BlockchainCertifyResponseDTO response = blockchainService
                     .certifyCertification(request.getCertificationId());
+            System.out.println(response);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             // 處理上鏈過程中可能發生的任何異常

@@ -1,5 +1,6 @@
-const apiUrl = 'http://120.110.115.123:8081/api/nursecertifications';
-const subjectApiUrl = 'http://120.110.115.123:8081/api/subjects'; // 獲取所有科目數據
+const BASE_API_URL = 'http://120.110.115.123:8081';
+const apiUrl = `${BASE_API_URL}/api/nursecertifications`;
+const subjectApiUrl = `${BASE_API_URL}/api/subjects`; // 獲取所有科目數據
 const tableBody = document.querySelector('#certificationsTable tbody');
 const loadingDiv = document.getElementById('loading');
 const messageDiv = document.getElementById('message');
@@ -104,7 +105,7 @@ subjectSelect.addEventListener('change', function () {
     }
 });
 
-// 載入護士證書列表
+// 載入護理師證書列表
 async function loadCertifications() {
     loadingDiv.style.display = 'block';
     tableBody.innerHTML = '';
@@ -154,11 +155,11 @@ async function loadCertifications() {
             const row = tableBody.insertRow();
             const cell = row.insertCell();
             cell.colSpan = 10;
-            cell.textContent = '沒有找到護士證書數據。';
+            cell.textContent = '沒有找到護理師證書數據。';
             cell.style.textAlign = 'center';
         }
     } catch (error) {
-        console.error('獲取護士證書數據時出錯:', error);
+        console.error('獲取護理師證書數據時出錯:', error);
         loadingDiv.textContent = '載入數據失敗，請檢查控制台。';
         loadingDiv.style.color = 'red';
     }
@@ -279,33 +280,45 @@ async function deleteCertification(id) {
 // 假設的 toBlockchain 函數 (保持不變)
 async function toBlockchain(certificationId) {
     if (!certificationId) {
-        showMessage('請選擇一個證書進行上鏈操作！', 'error');
+        showMessage('無效的證書 ID！', 'error');
         return;
     }
     showMessage(`正在處理 ID ${certificationId} 的證書上鏈...`, 'info');
+    const requestBody = {
+        certificationId: certificationId
+    };
     try {
         // 使用 fetch API 向您的 Blockchain Controller 發送請求
         // 您可以選擇使用 GET 請求 (傳遞路徑變數或查詢參數) 或 POST 請求 (傳遞請求體)
         // 這裡示範使用 POST 請求，並在請求體中傳遞 JSON 資料
 
-        const blockchainApiUrl = 'http://120.110.115.123:8081/api/blockchain/certify'; // 請替換為您的實際區塊鏈 Controller 端點
+        const blockchainApiUrl = `${BASE_API_URL}/api/blockchain/certify`; // 請替換為您的實際區塊鏈 Controller 端點
 
         const response = await fetch(blockchainApiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ certificationId: certificationId }) // 將證書ID作為 JSON 傳遞
+            body: JSON.stringify(requestBody) // 將證書ID作為 JSON 傳遞
         });
 
         if (!response.ok) {
             // 處理非 2xx 狀態碼的響應
-            const errorText = await response.text();
+            const errorText = await response.json();
             throw new Error(`上鏈失敗: ${response.status} - ${errorText}`);
         }
 
         const result = await response.json(); // 假設 Controller 會返回 JSON 響應
-        showMessage(`證書 ID ${certificationId} 上鏈成功！交易 Hash: ${result.transactionHash}`, 'success');
+        showMessage(`證書 ID ${certificationId} 上鏈成功！交易 Hash: ${result.blockHash},merkleRoot=${result.merkleRoot},nonce=${result.nonce}`, 'success');
+        /* 上鏈成功 視覺化
+        */
+        const queryParams = new URLSearchParams();
+        if (result.timestamp) queryParams.append('timestamp', result.timestamp);
+        if (result.blockHash) queryParams.append('blockHash', result.blockHash);
+        if (result.merkleRoot) queryParams.append('merkleRoot', result.merkleRoot);
+        if (result.nonce) queryParams.append('nonce', result.nonce);
+        // const blockchainSimulationUrl = `${BASE_API_URL}/blockchain-simulation.html?${queryParams.toString()}`
+        // window.location.href = blockchainSimulationUrl;
         console.log('上鏈成功響應:', result);
 
         // 您可能需要重新載入證書列表或更新UI以反映上鏈狀態

@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 public class BlockchainCertifyResponseDTO {
     private boolean success;
     private String message;
-    private String transactionHash; // 假設上鏈成功會返回一個交易哈希
+    private String blockHash;
+    private String merkleRoot;
+    private long timestamp;
+    private int nonce;
 
 }
