@@ -1,4 +1,5 @@
 const BASE_API_URL = 'http://120.110.115.123:8081';
+
 const apiUrl = `${BASE_API_URL}/api/nursecertifications`;
 const subjectApiUrl = `${BASE_API_URL}/api/subjects`; // 獲取所有科目數據
 const blockchainApiUrl = `${BASE_API_URL}/api/blockchain/certify`; // 區塊鏈 Controller 端點
@@ -6,6 +7,15 @@ const blockchainApiUrl = `${BASE_API_URL}/api/blockchain/certify`; // 區塊鏈 
 const tableBody = document.querySelector('#certificationsTable tbody');
 const loadingDiv = document.getElementById('loading');
 const messageDiv = document.getElementById('message'); // 主要訊息區域
+
+// 確保有 blockchainContainer 元素來顯示區塊，如果沒有，請在您的 HTML 中添加
+const blockchainContainer = document.getElementById('blockchainContainer');
+if (!blockchainContainer) {
+    console.warn("Element with ID 'blockchainContainer' not found. Block visualization might not work.");
+    // 您可以在這裡創建一個預設容器，或者要求用戶在 HTML 中添加
+    // document.body.appendChild(Object.assign(document.createElement('div'), { id: 'blockchainContainer' }));
+}
+
 const certificationForm = document.getElementById('certificationForm');
 const submitBtn = document.getElementById('submitBtn');
 const certificationIdInput = document.getElementById('certificationId');
@@ -28,29 +38,25 @@ function showMessage(msg, type = 'success', append = false, autoClearDuration = 
     p.textContent = msg;
     p.className = type; // 添加類型類別用於樣式
 
-    if (append) {
-        messageDiv.appendChild(p); // 追加訊息
-    } else {
+    if (!append) {
         messageDiv.innerHTML = ''; // 清空舊訊息
-        messageDiv.appendChild(p); // 替換訊息
     }
+    messageDiv.appendChild(p); // 追加訊息或替換後的首條訊息
     messageDiv.style.display = 'block'; // 確保訊息區域可見
 
     if (autoClearDuration > 0) {
+        // 如果需要自動清除，則只清除當前這條新追加的訊息
         setTimeout(() => {
-            // 只清除本條訊息，如果父容器有多條訊息則需要更複雜的清除邏輯
-            // 為了簡化，如果 autoClearDuration > 0，我們假設訊息是替換而不是追加的
-            if (!append) {
-                messageDiv.innerHTML = '';
-                messageDiv.style.display = 'none';
-            } else {
-                // 如果是追加的訊息且需要自動清除，可以考慮移除單獨的 <p> 元素
+            if (messageDiv.contains(p)) {
                 p.remove();
+                // 如果移除後沒有其他訊息，則隱藏容器
+                if (messageDiv.children.length === 0) {
+                    messageDiv.style.display = 'none';
+                }
             }
         }, autoClearDuration);
     }
 }
-
 
 // 輔助函數：清除表單
 function clearForm() {
@@ -64,9 +70,6 @@ function clearForm() {
     pointsInput.value = ''; // 清空積分
     submitBtn.textContent = '新增證書';
     submitBtn.style.backgroundColor = '#28a745';
-    // 不清除 messageDiv
-    // messageDiv.innerHTML = '';
-    // messageDiv.style.display = 'none';
 }
 
 // 載入所有科目數據 (包括 category 和 unit)
@@ -148,6 +151,7 @@ async function loadCertifications() {
         loadingDiv.style.display = 'none';
 
         if (data && data.length > 0) {
+
             data.forEach(cert => {
                 const row = tableBody.insertRow();
                 row.setAttribute('data-id', cert.id);
@@ -176,12 +180,29 @@ async function loadCertifications() {
                 deleteButton.onclick = () => deleteCertification(cert.id);
                 actionsCell.appendChild(deleteButton);
 
-                const toBlockChainButton = document.createElement('button'); // 修改變數名避免衝突
-                toBlockChainButton.textContent = '上鏈';
-                toBlockChainButton.className = 'btn-toBlockChain'; // 保持 class 名稱一致
-                toBlockChainButton.onclick = () => toBlockchain(cert.id, true); // 單獨上鏈時傳入 true，表示重定向
-                actionsCell.appendChild(toBlockChainButton);
+                // const toBlockChainButton = document.createElement('button'); // 修改變數名避免衝突
+                // toBlockChainButton.textContent = '上鏈';
+                // toBlockChainButton.className = 'btn-toBlockChain'; // 保持 class 名稱一致
+                // toBlockChainButton.onclick = () => toBlockchain(cert.id, true); // 單獨上鏈時傳入 true，表示重定向
+                // actionsCell.appendChild(toBlockChainButton);
             });
+            let totalPoints = 0;
+            data.forEach(cert => {
+                // ... (現有的行插入邏輯)
+                totalPoints += cert.points || 0; // 累計積分
+            });
+            const requiredPoints = 120; // 6年應修120點
+            const pointsNeeded = requiredPoints - totalPoints;
+
+            // 顯示累計積分和所需積分的提示
+            showMessage(
+                `目前累計積分: ${totalPoints.toFixed(1)} 點。` +
+                `6年應修 ${requiredPoints} 點，還需 ${pointsNeeded.toFixed(1)} 點。`,
+                pointsNeeded <= 0 ? 'success' : 'info', // 如果達到目標，顯示成功訊息
+                true, // 追加訊息
+                0 // 不自動清除
+            );
+
         } else {
             const row = tableBody.insertRow();
             const cell = row.insertCell();
@@ -343,6 +364,12 @@ async function toBlockchain(certificationId, redirectAfterCompletion = false) {
         const result = await response.json();
         console.log(`證書 ID ${certificationId} 上鏈成功響應:`, result);
 
+        // 將 result 物件傳遞給 addNewBlockToDisplay 函數來更新區塊鏈可視化
+        // 這會觸發網頁上新區塊的顯示
+        addNewBlockToDisplay(result);
+
+
+
         if (redirectAfterCompletion) {
             // 單獨上鏈成功時才重定向並清除原訊息
             showMessage(`證書 ID ${certificationId} 上鏈成功！區塊哈希: ${result.blockHash}`, 'success');
@@ -364,6 +391,31 @@ async function toBlockchain(certificationId, redirectAfterCompletion = false) {
         }
         return null; // 返回 null 表示失敗
     }
+
+}
+
+const GENESIS_BLOCK_DATA = {
+    version: 'v1',
+    previousHash: '0', // 創世塊的前一個區塊哈希通常是 '0' 或 NULL
+    timestamp: new Date('2025/7/19 9:27:01').getTime(), // 使用您圖片中的時間戳
+    difficulty: 1,
+    nonce: 0, // 創世塊的 nonce
+    merkleRoot: 'e3b0c44298fc1c149afbf4c8996b92427a4e464b934ca4b991b7852b855', // 您的圖片中的 Merkle root
+    transactions: [], // 創世塊通常沒有交易，或只有特殊的創世交易
+    // 其他圖片中顯示的創世區塊資訊
+    blockHash: '844571e06527950110ffe8542f89754c8d6b6c65ae05954b2aaeeb215ca1e1599' // 您的圖片中的區塊哈希
+};
+
+// 載入創世塊到顯示器
+function loadGenesisBlock() {
+    const blockchainContainer = document.getElementById('blockchainContainer');
+    if (blockchainContainer) {
+        const genesisBlockElement = createBlockElement(GENESIS_BLOCK_DATA);
+        // 您可以給創世塊添加一個特定的 class 來區分樣式
+        genesisBlockElement.classList.add('genesis-block');
+        // 將創世塊添加到容器的最開始
+        blockchainContainer.prepend(genesisBlockElement);
+    }
 }
 
 /**
@@ -377,7 +429,7 @@ async function toBlockchainAllCertifications() {
     }
 
     // 清空並初始化訊息區域，然後追加總體進度訊息
-    messageDiv.innerHTML = '';
+    messageDiv.innerHTML = ''; // 清空所有訊息
     showMessage(`開始一鍵上鏈所有 ${allCertRows.length} 筆證書...`, 'info', true, 0); // 持續顯示，不自動清除
 
     const toBlockchainAllBtn = document.getElementById('toBlockchainAllBtn');
@@ -393,11 +445,13 @@ async function toBlockchainAllCertifications() {
             continue;
         }
 
-        // 可以為正在處理的行添加視覺回饋，例如改變背景色
         row.style.backgroundColor = '#e0f7fa'; // 淺藍色表示處理中
+        showMessage(`正在上鏈證書 ID: ${certificationId}...`, 'info', true, 0); // 追加實時進度
 
         // 呼叫 toBlockchain 函數，設置 redirectAfterCompletion 為 false
         const result = await toBlockchain(certificationId, false); // result 會是 object 或 null
+
+        // 移除單一區塊數據顯示的程式碼，因為 addNewBlockToDisplay 已經處理了視覺化
 
         if (result) {
             successfulUploads++;
@@ -408,8 +462,8 @@ async function toBlockchainAllCertifications() {
                 btn.disabled = true;
                 btn.style.backgroundColor = '#4CAF50';
             }
-            // 追加成功的上鏈資訊
-            showMessage(`ID ${certificationId} 上鏈成功！Hash: ${result.blockHash}, Merkle: ${result.merkleRoot}, Nonce: ${result.nonce}`, 'success', true, 0);
+            // 不需要再次呼叫 addNewBlockToDisplay(result) 因為 toBlockchain 內部已經呼叫了
+            showMessage(`ID ${certificationId} 上鏈成功！`, 'success', true, 0); // 追加成功的訊息
         } else {
             failedUploads++;
             row.style.backgroundColor = '#ffebee'; // 淺紅色表示失敗
@@ -419,25 +473,30 @@ async function toBlockchainAllCertifications() {
                 btn.disabled = false; // 失敗的可以考慮允許再次嘗試
                 btn.style.backgroundColor = '#f44336';
             }
-            // 追加失敗的訊息
-            showMessage(`ID ${certificationId} 上鏈失敗！`, 'error', true, 0);
+            // 不需要在這裡呼叫 addNewBlockToDisplay(result)，因為是失敗的情況
+            showMessage(`ID ${certificationId} 上鏈失敗！`, 'error', true, 0); // 追加失敗的訊息
         }
-
-        // 移除處理中的背景色，或者保留成功/失敗的顏色
-        // row.style.backgroundColor = ''; 
 
         // 添加一個小延遲，避免請求過於頻繁
         await new Promise(resolve => setTimeout(resolve, 500)); // 延遲 500 毫秒
     }
 
     // 所有處理完成後的總結訊息
-    showMessage(`所有證書上鏈完成。成功: ${successfulUploads} 筆，失敗: ${failedUploads} 筆。`, 'info', true, 0); // 持續顯示
-    toBlockchainAllBtn.disabled = false; // 重新啟用按鈕
+    showMessage(`所有證書上鏈完成。成功: ${successfulUploads} 筆，失敗: ${failedUploads} 筆。`, 'info', true, 5000); // 顯示5秒
+    toBlockchainAllBtn.disabled = false;
+    // 禁用所有編輯和刪除按鈕
+    document.querySelectorAll('.btn-edit, .btn-delete').forEach(button => {
+        button.disabled = true;
+        button.style.opacity = '0.5'; // 可選：視覺上表示禁用
+        button.style.cursor = 'not-allowed';
+    });
+    // 重新啟用按鈕
 }
-
 
 // 頁面載入時執行
 document.addEventListener('DOMContentLoaded', async () => {
+    //  loadGenesisBlock();
+
     await loadAllSubjectsData(); // 先載入所有科目數據（包括類別和名稱）
     await loadCertifications(); // 再載入證書列表
 
@@ -447,3 +506,49 @@ document.addEventListener('DOMContentLoaded', async () => {
         toBlockchainAllBtn.addEventListener('click', toBlockchainAllCertifications);
     }
 });
+
+// 假設這是您從後端獲取的新區塊數據
+function createBlockElement(blockData) {
+    const blockCard = document.createElement('div');
+    blockCard.className = 'block-card';
+
+    // 檢查 blockData 是否為空或無效，以避免錯誤
+    if (!blockData) {
+        blockCard.innerHTML = `<h3>錯誤：區塊數據無效</h3><p>無法顯示區塊資訊。</p>`;
+        return blockCard;
+    }
+
+    // 根據您的數據結構填充區塊內容
+    // 這裡的 blockData 應該是 BlockchainCertifyResponse DTO 的內容
+    blockCard.innerHTML = `
+        <h3>上鏈證書區塊</h3>
+        <p><strong>區塊哈希:</strong> ${blockData.blockHash || 'N/A'}</p>
+        <p><strong>Merkle Root:</strong> ${blockData.merkleRoot || 'N/A'}</p>
+        <p><strong>時間戳記:</strong> ${blockData.timestamp ? new Date(blockData.timestamp).toLocaleString() : 'N/A'}</p>
+        <p><strong>隨機數 (Nonce):</strong> ${blockData.nonce !== undefined ? blockData.nonce : 'N/A'}</p>
+        <p><strong>證書 ID:</strong> ${blockData.certificationId || 'N/A'}</p>
+        <p><strong>訊息:</strong> ${blockData.message || 'N/A'}</p>
+        <button onclick="controlBlock('${blockData.blockHash}')">控制</button>
+    `;
+    return blockCard;
+}
+
+// 當您成功上鏈並獲取到新區塊數據後，呼叫此函數
+function addNewBlockToDisplay(blockData) {
+
+    // 確保 blockchainContainer 存在
+    if (blockchainContainer) {
+        const newBlockElement = createBlockElement(blockData);
+        blockchainContainer.appendChild(newBlockElement);
+        // 可選：滾動到最新區塊
+        blockchainContainer.scrollLeft = blockchainContainer.scrollWidth;
+    } else {
+        console.error("無法將區塊添加到顯示器，因為 'blockchainContainer' 元素不存在。");
+    }
+}
+
+// 這是 controlBlock 函數的假設實現，如果它在您的代碼中被定義
+function controlBlock(blockHash) {
+    alert(`控制區塊哈希: ${blockHash}`);
+    // 在這裡添加您控制區塊的邏輯
+}

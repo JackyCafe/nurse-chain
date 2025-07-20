@@ -132,3 +132,165 @@
         .error {
             color: red;
         }
+
+        /* 您可以將這些 CSS 添加到您的 style.css 文件中或 <style> 標籤內 */
+
+
+        .block-card {
+            flex-shrink: 0;
+            /* 防止區塊在空間不足時縮小 */
+            width: 300px;
+            /* 每個區塊的固定寬度 */
+            /* height: 400px; */
+            /* 如果需要固定高度 */
+            border: 1px solid #ccc;
+            /* 邊框 */
+            border-radius: 8px;
+            /* 圓角 */
+            padding: 15px;
+            /* 區塊內部填充 */
+            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+            /* 陰影效果 */
+            background-color: #fff;
+            /* 背景色 */
+            /* 根據您的設計調整其他樣式 */
+        }
+
+
+
+        #blockchainContainer {
+            display: flex;
+            /* 讓區塊水平排列 */
+            overflow-x: auto;
+            /* 超出容器時顯示水平滾動條 */
+            padding: 20px;
+            /* 容器內邊距，增加視覺空間 */
+            gap: 20px;
+            /* 區塊之間的間距 */
+            align-items: flex-start;
+            /* 讓所有區塊從頂部對齊 */
+            /* background-color: #f0f2f5; 考慮給容器一個淺色背景 */
+            border: 1px solid #ddd;
+            /* 給容器一個輕微的邊框 */
+            border-radius: 8px;
+            /* 輕微的圓角 */
+        }
+
+        .block-card {
+            flex-shrink: 0;
+            /* 防止區塊在Flex容器中縮小 */
+            width: 320px;
+            /* 調整為您認為合適的寬度 */
+            /* height: 450px; 如果需要固定高度，但通常內容驅動會更好 */
+            background-color: #fff;
+            /* 區塊背景色 */
+            border: 1px solid #e0e0e0;
+            /* 輕微的邊框 */
+            border-radius: 12px;
+            /* 較大的圓角，增加柔和感 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            /* 增加陰影，提供立體感 */
+            padding: 20px;
+            /* 區塊內部填充，避免內容擁擠 */
+            margin: 0;
+            /* 確保沒有額外的外部邊距，因為父容器已經設定了gap */
+            display: flex;
+            /* 內部內容也可能需要flex佈局來垂直排版 */
+            flex-direction: column;
+            justify-content: space-between;
+            /* 使內容在區塊內均勻分佈 */
+        }
+
+        .genesis-block {
+            background-color: #e0f2f7;
+            /* 創世塊可以有不同的背景色 */
+            border-color: #a7d9ed;
+        }
+
+        /* 針對區塊內部的標題和段落添加樣式 */
+        .block-card h3 {
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 1px dashed #eee;
+            /* 分隔線 */
+            padding-bottom: 10px;
+        }
+
+        .block-card p {
+            margin-bottom: 8px;
+            /* 調整段落之間的間距 */
+            line-height: 1.5;
+            /* 行高，提升可讀性 */
+            color: #555;
+            word-break: break-all;
+            /* 防止長哈希值超出邊界 */
+        }
+
+        .block-card strong {
+            color: #007bff;
+            /* 關鍵資訊可以使用強調色 */
+        }
+
+        .block-card h4 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        .block-card .transactions {
+            background-color: #f8f8f8;
+            border-radius: 8px;
+            padding: 10px;
+            max-height: 120px;
+            /* 限制交易記錄高度，可滾動 */
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .block-card .transactions p {
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            color: #666;
+        }
+
+        .block-card button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            /* 按鈕懸停效果 */
+        }
+
+        .block-card button:hover {
+            background-color: #0056b3;
+        }
+
+        .table-header-controls {
+            display: flex;
+            /* 啟用 Flexbox 佈局 */
+            justify-content: space-between;
+            /* 將內容（標題和按鈕）推到兩端 */
+            align-items: center;
+            /* 垂直居中對齊 */
+            margin-bottom: 20px;
+            /* 在標題和表格之間留出一些空間 */
+        }
+
+        /* 調整按鈕樣式，從內聯樣式移到 CSS 規則中 */
+        #toBlockchainAllBtn {
+            margin-top: 0;
+            /* 移除原有的 margin-top */
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #3f92f7e8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
