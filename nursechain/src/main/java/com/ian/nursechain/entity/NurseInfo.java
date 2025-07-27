@@ -53,6 +53,7 @@ public class NurseInfo {
     private Set<NurseCertifications> nurseCertifications = new HashSet<>();
 
     @OneToOne(mappedBy = "nurseInfo", fetch = FetchType.LAZY)
+    @JsonManagedReference
     private Hospital hospital; // 在 Hospital 實體中應有對應的 @JsonBackReference
 
     public NurseInfo(String identyNo, String user, String name, String passwd) {
