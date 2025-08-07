@@ -158,7 +158,9 @@ async function loadCertifications() {
                 // 新增 data-certification-id 屬性以便「一鍵上鏈」功能使用
                 row.setAttribute('data-certification-id', cert.id);
                 row.insertCell().textContent = cert.id;
-                row.insertCell().textContent = cert.nurseId;
+                row.insertCell().textContent = cert.subjectCode; // 顯示科目代碼
+                row.insertCell().textContent = cert.category; // 顯示類別
+                //row.insertCell().textContent = cert.nurseId;
                 row.insertCell().textContent = cert.nurseName;
                 row.insertCell().textContent = cert.subjectId;
                 row.insertCell().textContent = cert.subjectName;
@@ -187,17 +189,33 @@ async function loadCertifications() {
                 // actionsCell.appendChild(toBlockChainButton);
             });
             let totalPoints = 0;
+            let professionPoints = 0;
+            let otherPoint
             data.forEach(cert => {
                 // ... (現有的行插入邏輯)
                 totalPoints += cert.points || 0; // 累計積分
             });
+
+            data.forEach(cert => {
+                if (cert.subjectCode === 1) {
+                    professionPoints += cert.points || 0; // 累計專業積分
+                } else {
+                    otherPoint += cert.points || 0; // 累計其他積分
+                }
+            });
+            if (otherPoint > 24) { otherPoint = 24; } // 其他積分最多只能24點
             const requiredPoints = 120; // 6年應修120點
             const pointsNeeded = requiredPoints - totalPoints;
+            const profrssionNeeded = 96 - professionPoints; // 專業積分需要的點數
+            const OtherNeeded = 12 - (totalPoints - professionPoints); // 其他積分需要的點數
 
             // 顯示累計積分和所需積分的提示
             showMessage(
                 `目前累計積分: ${totalPoints.toFixed(1)} 點。` +
-                `6年應修 ${requiredPoints} 點，還需 ${pointsNeeded.toFixed(1)} 點。`,
+                `6年應修 ${requiredPoints} 點，還需 ${pointsNeeded.toFixed(1)} 點。` +
+                `6年應修 專業96點，還需${profrssionNeeded.toFixed(1)} 點。\n` +
+                `6年應修 品質倫理法律至少需12點，還需${OtherNeeded.toFixed(1)} 點。\n`,
+
                 pointsNeeded <= 0 ? 'success' : 'info', // 如果達到目標，顯示成功訊息
                 true, // 追加訊息
                 0 // 不自動清除

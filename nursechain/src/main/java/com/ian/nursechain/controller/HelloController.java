@@ -17,4 +17,14 @@ public class HelloController {
     public String nurse_certification() {
         return "nurseCertifications";
     }
+
+    @GetMapping("/nurse-info")
+    public String nurse_info() {
+        return "nurseInfo";
+    }
+
+    @GetMapping("/hospital")
+    public String hospital() {
+        return "hospital";
+    }
 }

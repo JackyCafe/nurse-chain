@@ -38,6 +38,9 @@ public class Subject {
     @Column(name = "category", nullable = false)
     private String category;
 
+    @Column(name = "subject_code", nullable = false)
+    private int subjectCode;
+
     @Column(name = "teacher", nullable = false)
     private String teacher;
 

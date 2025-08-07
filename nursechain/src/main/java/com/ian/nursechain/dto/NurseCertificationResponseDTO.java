@@ -19,6 +19,7 @@ public class NurseCertificationResponseDTO {
     private Float points;
     private String category;
     private String unit;
+    private int subjectCode; // 這裡的 subject 是指科目名稱
 
     // Constructors, Getters, Setters (可以使用 Lombok 的 @Getter, @Setter,
     // @NoArgsConstructor, @AllArgsConstructor)
@@ -74,6 +75,9 @@ public class NurseCertificationResponseDTO {
                 .map(Subject::getUnit)
                 .orElse("Unknown unit"); // 這裡的字串應該是 "Unknown unit"
 
+        int subjectCode = Optional.ofNullable(entity.getSubject())
+                .map(Subject::getSubjectCode).orElse(null); // 這裡的字串應該
+
         return new NurseCertificationResponseDTO(
                 entity.getId(),
                 entity.getNurseInfo() != null ? entity.getNurseInfo().getId() : null, // 避免空指針
@@ -84,12 +88,13 @@ public class NurseCertificationResponseDTO {
                 entity.getPoints(),
                 category,
                 subjectName, // 傳入 subjectName
-                unit); // 傳入 unit
+
+                unit, subjectCode); // 傳入 unit
     }
 
     public NurseCertificationResponseDTO(Long id, Long nurseId, String nurseName, Long subjectId,
             LocalDateTime startTime, LocalDateTime endTime, Float points, String category, String subject,
-            String unit) {
+            String unit, int subjectCode) {
         this.id = id;
         this.nurseId = nurseId;
         this.nurseName = nurseName;
@@ -100,6 +105,7 @@ public class NurseCertificationResponseDTO {
         this.category = category;
         this.subjectName = subject;
         this.unit = unit;
+        this.subjectCode = subjectCode; // 初始化 subjectCode
     }
 
     public Long getId() {
@@ -180,5 +186,13 @@ public class NurseCertificationResponseDTO {
 
     public String getUnit() {
         return this.unit;
+    }
+
+    public int getSubjectCode() {
+        return subjectCode;
+    }
+
+    public void setSubjectCode(int subjectCode) {
+        this.subjectCode = subjectCode;
     }
 }

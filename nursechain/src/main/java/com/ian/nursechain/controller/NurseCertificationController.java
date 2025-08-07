@@ -41,6 +41,7 @@ public class NurseCertificationController {
     // 獲取所有護士證書
     @GetMapping
     public ResponseEntity<List<NurseCertificationResponseDTO>> getAllNurseCertifications() {
+
         List<NurseCertificationResponseDTO> certifications = nurseCertificationService.getAllNurseCertifications();
         return ResponseEntity.ok(certifications); // 返回 200 OK
     }
