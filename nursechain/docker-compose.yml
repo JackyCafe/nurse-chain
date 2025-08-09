@@ -1,0 +1,25 @@
+version: '3.7'
+
+services:
+  db:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345678   # root 密碼
+      MYSQL_DATABASE: testdb          # 預設建立的資料庫
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: 12345678          # 一定要跟 MYSQL_ROOT_PASSWORD 一樣
+    ports:
+      - "8080:80"
