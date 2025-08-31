@@ -1,0 +1,13 @@
+{
+    "folders": [
+        {
+            "name": "nurse-chain",
+            "path": "."
+        }
+    ],
+    "settings": {
+        "code-runner.executorMapByFileExtension": {
+            ".java": "cd ${workspaceFolder} && ./mvnw spring-boot:run"
+        }
+    }
+}

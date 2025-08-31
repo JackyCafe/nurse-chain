@@ -1,4 +1,4 @@
-const BASE_API_URL = 'http://120.110.115.123:8081';
+const BASE_API_URL = 'http://127.0.0.1:8081';
 
 const apiUrl = `${BASE_API_URL}/api/nursecertifications`;
 const subjectApiUrl = `${BASE_API_URL}/api/subjects`; // 獲取所有科目數據
@@ -205,16 +205,16 @@ async function loadCertifications() {
             });
             if (otherPoint > 24) { otherPoint = 24; } // 其他積分最多只能24點
             const requiredPoints = 120; // 6年應修120點
-            const pointsNeeded = requiredPoints - totalPoints;
-            const profrssionNeeded = 96 - professionPoints; // 專業積分需要的點數
-            const OtherNeeded = 12 - (totalPoints - professionPoints); // 其他積分需要的點數
+            const pointsNeeded = (requiredPoints - totalPoints) < 0 ? 0 : (requiredPoints - totalPoints);
+            const profrssionNeeded = (96 - professionPoints) < 0 ? 0 : (96 - professionPoints); // 專業積分需要的點數
+            const OtherNeeded = (12 - (totalPoints - professionPoints)) < 0 ? 0 : 12 - (totalPoints - professionPoints); // 其他積分需要的點數
 
             // 顯示累計積分和所需積分的提示
             showMessage(
-                `目前累計積分: ${totalPoints.toFixed(1)} 點。` +
-                `6年應修 ${requiredPoints} 點，還需 ${pointsNeeded.toFixed(1)} 點。` +
-                `6年應修 專業96點，還需${profrssionNeeded.toFixed(1)} 點。\n` +
-                `6年應修 品質倫理法律至少需12點，還需${OtherNeeded.toFixed(1)} 點。\n`,
+                `Current accumulated points: ${totalPoints.toFixed(1)} point。` +
+                `6 years should be taken ${requiredPoints} points，Need ${pointsNeeded.toFixed(1)} Points` +
+                `including professional 96 point，needs ${profrssionNeeded.toFixed(1)} points。\n` +
+                `quality/ethics/law at least 12 point，need ${OtherNeeded.toFixed(1)} points。\n`,
 
                 pointsNeeded <= 0 ? 'success' : 'info', // 如果達到目標，顯示成功訊息
                 true, // 追加訊息

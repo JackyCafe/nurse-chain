@@ -1,60 +1,62 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>護士證書管理</title>
+    <title>Nursing Certificate Management</title>
     <link rel="stylesheet" href="css/style.css">
 
 </head>
+
 <body>
-    
-        <h1>證書管理</h1>
 
-        <h2>新增/編輯證書</h2>
-        <form id="certificationForm">
-            <input type="hidden" id="certificationId">
-            <label for="nurseId">護士ID:</label>
-            <input type="number" id="nurseId" required>
+    <h1>Certificate Management</h1>
 
-            <label for="categorySelect">科目類別:</label>
-            <select id="categorySelect" required>
-                <option value="">請選擇類別</option>
-            </select>
+    <h2>Insert/Modify </h2>
+    <form id="certificationForm">
+        <input type="hidden" id="certificationId">
+        <label for="nurseId">Nurse ID:</label>
+        <input type="number" id="nurseId" required>
 
-            <label for="subjectSelect">科目名稱:</label>
-            <select id="subjectSelect" required disabled>
-                <option value="">請先選擇類別</option>
-            </select>
-            
-            <input type="hidden" id="subjectId"> <label for="startTime">開始時間:</label>
-            <input type="datetime-local" id="startTime" required>
+        <label for="categorySelect">Subject Category:</label>
+        <select id="categorySelect" required>
+            <option value="">請選擇類別</option>
+        </select>
 
-            <label for="endTime">結束時間:</label>
-            <input type="datetime-local" id="endTime" required>
+        <label for="subjectSelect">Subject Name:</label>
+        <select id="subjectSelect" required disabled>
+            <option value="">請先選擇類別</option>
+        </select>
 
-            <label for="points">積分:</label>
-            <input type="number" step="0.1" id="points" required>
+        <input type="hidden" id="subjectId"> <label for="startTime">Start Time:</label>
+        <input type="datetime-local" id="startTime" required>
 
-            <label for="unit">單位:</label>
-            <input type="text" id="unit" readonly>
+        <label for="endTime">End Time:</label>
+        <input type="datetime-local" id="endTime" required>
 
-            <button type="submit" id="submitBtn">新增證書</button>
-        </form>
-        <div id="message"></div>
-         <div id="blockchainContainer" style="display: flex; overflow-x: auto; padding: 20px; gap: 20px;">
-        </div>
+        <label for="points">Point:</label>
+        <input type="number" step="0.1" id="points" required>
+
+        <label for="unit">單位:</label>
+        <input type="text" id="unit" readonly>
+
+        <button type="submit" id="submitBtn">新增證書</button>
+    </form>
+    <div id="message"></div>
+    <div id="blockchainContainer" style="display: flex; overflow-x: auto; padding: 20px; gap: 20px;">
+    </div>
     </div>
     </div>
 
     <div class="container">
-       <div class="table-header-controls">
-    <h2>證書列表</h2>
-    <button id="toBlockchainAllBtn">
-        一鍵上鏈
-    </button>
-</div>
-      
+        <div class="table-header-controls">
+            <h2>證書列表</h2>
+            <button id="toBlockchainAllBtn">
+                一鍵上鏈
+            </button>
+        </div>
+
         <div id="loading">載入中...</div>
         <table id="certificationsTable">
             <thead>
@@ -65,7 +67,7 @@
                     <th>護士姓名</th>
                     <th>科目ID</th>
                     <th>科目名稱</th>
-                    
+
                     <th>開始時間</th>
                     <th>結束時間</th>
                     <th>積分</th>
@@ -74,11 +76,11 @@
                 </tr>
             </thead>
             <tbody>
-                </tbody>
+            </tbody>
         </table>
     </div>
 
-       <script src="/js/nurse_certification.js"></script>
+    <script src="/js/nurse_certification.js"></script>
 
 </body>
 

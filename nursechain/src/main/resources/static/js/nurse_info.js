@@ -1,4 +1,4 @@
-const API_URL = 'http://120.110.115.123:8081/api/nurseinfo'; // 您的 API 端點
+const API_URL = 'http://127.0.0.1:8081/api/nurseinfo'; // 您的 API 端點
 const nurseForm = document.getElementById('nurseForm');
 const nurseTableBody = document.querySelector('#nurseTable tbody');
 const messageDiv = document.getElementById('message');

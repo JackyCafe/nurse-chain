@@ -1,42 +1,44 @@
 <!DOCTYPE html>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>護理師資訊管理 (CRUD)</title>
     <link rel="stylesheet" href="/css/nurseInfo.css">
 </head>
-    <body>
+
+<body>
     <div class="container">
         <h1>護理師資訊管理系統</h1>
 
         <div class="message" id="message"></div>
 
         <section>
-            <h2>新增/更新護理師</h2>
+            <h2>Add/ Modify Nurse</h2>
             <form id="nurseForm">
                 <div class="form-group">
-                    <label for="nurseId">ID (更新時填寫):</label>
+                    <label for="nurseId">ID :</label>
                     <input type="number" id="nurseId" name="id" placeholder="用於更新或刪除">
                 </div>
                 <div class="form-group">
-                    <label for="identyNo">身分證號:</label>
+                    <label for="identyNo">identy No:</label>
                     <input type="text" id="identyNo" name="identyNo" required>
                 </div>
                 <div class="form-group">
-                    <label for="user">使用者帳號:</label>
+                    <label for="user">Account:</label>
                     <input type="text" id="user" name="user" required>
                 </div>
                 <div class="form-group">
-                    <label for="name">姓名:</label>
+                    <label for="name">Name:</label>
                     <input type="text" id="name" name="name" required>
                 </div>
                 <div class="form-group">
-                    <label for="passwd">密碼:</label>
+                    <label for="passwd">password:</label>
                     <input type="password" id="passwd" name="passwd" required>
                 </div>
                 <div class="buttons">
-                    <button type="submit" class="btn-primary">保存</button>
-                    <button type="button" class="btn-secondary" id="resetFormBtn">重置表單</button>
+                    <button type="submit" class="btn-primary">Save</button>
+                    <button type="button" class="btn-secondary" id="resetFormBtn">Reset</button>
                 </div>
             </form>
         </section>
@@ -49,17 +51,19 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>身分證號</th>
-                        <th>使用者帳號</th>
-                        <th>姓名</th>
-                        <th>操作</th>
+                        <th>identyNo</th>
+                        <th>Account</th>
+                        <th>Name</th>
+                        <th>Operation</th>
                     </tr>
                 </thead>
                 <tbody>
-                    </tbody>
+                </tbody>
             </table>
         </section>
     </div>
-    <script src="/js/nurse_info.js" ></script>
+    <script src="/js/nurse_info.js"></script>
+
     <body>
-</html> 
+
+        </html>
