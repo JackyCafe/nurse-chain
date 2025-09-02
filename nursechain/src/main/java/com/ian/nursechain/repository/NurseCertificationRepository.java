@@ -1,6 +1,9 @@
 package com.ian.nursechain.repository; // 建議放在 repository 包下
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.ian.nursechain.entity.NurseCertifications;
@@ -18,4 +21,6 @@ public interface NurseCertificationRepository extends JpaRepository<NurseCertifi
     // 您可以在這裡定義自定義查詢方法，例如：
     // List<NurseCertifications> findByNurseInfo_Id(Long nurseId);
     // List<NurseCertifications> findBySubject_Id(Long subjectId);
+    @Query("SELECT nc FROM NurseCertifications nc ORDER BY nc.nurseInfo.id")
+    List<NurseCertifications> findAllOrderByNurseId();
 }

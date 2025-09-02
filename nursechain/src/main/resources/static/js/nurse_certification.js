@@ -445,6 +445,8 @@ async function toBlockchainAllCertifications() {
         showMessage('沒有可上鏈的證書。', 'info'); // 替換顯示
         return;
     }
+    const overallStartTime = Date.now();
+
 
     // 清空並初始化訊息區域，然後追加總體進度訊息
     messageDiv.innerHTML = ''; // 清空所有訊息
@@ -497,11 +499,22 @@ async function toBlockchainAllCertifications() {
 
         // 添加一個小延遲，避免請求過於頻繁
         await new Promise(resolve => setTimeout(resolve, 500)); // 延遲 500 毫秒
+
+        toBlockchainAllBtn.disabled = false;
+
+
     }
 
     // 所有處理完成後的總結訊息
     showMessage(`所有證書上鏈完成。成功: ${successfulUploads} 筆，失敗: ${failedUploads} 筆。`, 'info', true, 5000); // 顯示5秒
+
     toBlockchainAllBtn.disabled = false;
+    const overallEndTime = Date.now();
+    const overallTotalTime = overallEndTime - overallStartTime;
+    // 所有處理完成後的總結訊息
+    showMessage(`所有證書上鏈完成。成功: ${successfulUploads} 筆，失敗: ${failedUploads} 筆。`, 'info', true, 5000);
+    showMessage(`總上鏈時間： ${overallTotalTime / 1000} ms。`, 'info', true, 0);
+
     // 禁用所有編輯和刪除按鈕
     document.querySelectorAll('.btn-edit, .btn-delete').forEach(button => {
         button.disabled = true;

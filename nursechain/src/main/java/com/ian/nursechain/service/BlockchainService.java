@@ -1,11 +1,15 @@
 package com.ian.nursechain.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.ian.blockchain.models.Block;
@@ -81,5 +85,66 @@ public class BlockchainService {
 
         }
 
+    }
+
+     /**
+     * 以 nurse_id 為key，將相同的證書上鏈，並分別統計每個護士的上鏈總時間、上鏈數量及總積分
+     * @return 包含每個護士上鏈總時間、證書數量和總積分的 Map
+     */
+    public Map<Long, Map<String, Object>> certifyByNurseId() {
+        Map<Long, Map<String, Object>> result = new HashMap<>();
+
+        // 1. 取得所有證書並按 nurse_id 分組
+        Map<Long, List<NurseCertifications>> certificationsByNurse = repository.findAll().stream()
+                .collect(Collectors.groupingBy(nc -> nc.getNurseInfo().getId()));
+
+        // 2. 遍歷每個護士的分組
+        for (Map.Entry<Long, List<NurseCertifications>> entry : certificationsByNurse.entrySet()) {
+            Long nurseId = entry.getKey();
+            List<NurseCertifications> certifications = entry.getValue();
+
+            // 創建兩個獨立的 Map 來存放專業類和非專業類的數據
+            Map<String, Object> proStats = new HashMap<>();
+            proStats.put("上鍊證書數量", 0);
+            proStats.put("上鍊總積分", 0.0f);
+            proStats.put("上鍊總時間(秒)", 0.0);
+
+            Map<String, Object> nonProStats = new HashMap<>();
+            nonProStats.put("上鍊證書數量", 0);
+            nonProStats.put("上鍊總積分", 0.0f);
+            nonProStats.put("上鍊總時間(秒)", 0.0);
+
+            // 3. 遍歷該護士的所有證書並逐一上鏈
+            for (NurseCertifications cert : certifications) {
+                StopWatch stopWatch = new StopWatch();
+                stopWatch.start();
+                try {
+                    certifyCertification(cert.getId());
+                } catch (Exception e) {
+                    System.err.println("上鏈失敗 for Certification ID: " + cert.getId() + " - " + e.getMessage());
+                }
+                stopWatch.stop();
+
+                if (cert.getSubject().getSubjectCode() == 1) {
+                    // 更新專業類統計
+                    proStats.put("上鍊證書數量", (int) proStats.get("上鍊證書數量") + 1);
+                    proStats.put("上鍊總積分", (float) proStats.get("上鍊總積分") + cert.getPoints());
+                    proStats.put("上鍊總時間(秒)", (double) proStats.get("上鍊總時間(秒)") + (stopWatch.getLastTaskTimeMillis() / 1000.0));
+                } else {
+                    // 更新非專業類統計
+                    nonProStats.put("上鍊證書數量", (int) nonProStats.get("上鍊證書數量") + 1);
+                    nonProStats.put("上鍊總積分", (float) nonProStats.get("上鍊總積分") + cert.getPoints());
+                    nonProStats.put("上鍊總時間(秒)", (double) nonProStats.get("上鍊總時間(秒)") + (stopWatch.getLastTaskTimeMillis() / 1000.0));
+                }
+            }
+
+            // 將專業類和非專業類的統計結果放入總結果地圖
+            Map<String, Object> nurseTotalStats = new HashMap<>();
+            nurseTotalStats.put("專業類", proStats);
+            nurseTotalStats.put("非專業類", nonProStats);
+            result.put(nurseId, nurseTotalStats);
+        }
+
+        return result;
     }
 }

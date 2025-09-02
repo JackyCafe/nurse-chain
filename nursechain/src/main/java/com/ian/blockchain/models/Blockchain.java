@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Blockchain {
     public static List<Block> blockchain = new ArrayList<>();
-    public static int difficulty = 3; // 挖礦難度，前綴零的數量
+    public static int difficulty = 4; // 挖礦難度，前綴零的數量
 
     // 創世區塊 (Genesis Block) 的建立
     public static void createGenesisBlock() {
