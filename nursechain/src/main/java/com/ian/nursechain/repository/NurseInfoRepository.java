@@ -8,7 +8,6 @@ import com.ian.nursechain.entity.NurseInfo;
 
 public interface NurseInfoRepository extends JpaRepository<NurseInfo, Long> {
     List<NurseInfo> findByIdentyNo(String user);
-
     List<NurseInfo> findAll();
 
 }

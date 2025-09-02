@@ -1,11 +1,7 @@
 package com.ian.nursechain.controller;
 
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +18,6 @@ public class BlockchainController {
 
     private final BlockchainService blockchainService;
 
-    @Autowired
     public BlockchainController(BlockchainService blockchainService) {
         this.blockchainService = blockchainService;
     }
@@ -60,11 +55,11 @@ public class BlockchainController {
      * 以護士ID為 key 將所有護士的證書分組上鏈並統計時間和總積分
      * GET /api/blockchain/certify-by-nurse
      * @return 每個護士的上鏈總時間、證書數量和總積分
-     */
+
     @GetMapping("/certify-by-nurse")
     public ResponseEntity<Map<Long, Map<String, Object>>> certifyByNurseId() {
         Map<Long, Map<String, Object>> result = blockchainService.certifyByNurseId();
         return ResponseEntity.ok(result);
     }
-
+*/
 }

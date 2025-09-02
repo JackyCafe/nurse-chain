@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
@@ -26,7 +25,6 @@ public class BlockchainService {
 
     private final NurseCertificationRepository repository;
 
-    @Autowired
     public BlockchainService(NurseCertificationRepository nurseCertificationRepository) {
         this.repository = nurseCertificationRepository;
         if (Blockchain.blockchain.isEmpty()) {

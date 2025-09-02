@@ -66,6 +66,18 @@ public class NurseCertificationService {
                                 .collect(Collectors.toList());
         }
 
+        /**
+     * 根據護士ID獲取其所有證照清單
+     * @param nurseId 護士的ID
+     * @return 該護士的所有證照清單DTO
+     */
+    @Transactional(readOnly = true)
+    public List<NurseCertificationResponseDTO> getNurseCertificationsByNurseId(Long nurseId) {
+        return nurseCertificationRepository.findByNurseInfoId(nurseId).stream()
+                .map(NurseCertificationResponseDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
         @Transactional(readOnly = true)
         public NurseCertificationResponseDTO getNurseCertificationById(Long id) {
                 return nurseCertificationRepository.findById(id)

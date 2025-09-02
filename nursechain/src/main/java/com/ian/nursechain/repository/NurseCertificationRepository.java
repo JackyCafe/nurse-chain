@@ -23,4 +23,13 @@ public interface NurseCertificationRepository extends JpaRepository<NurseCertifi
     // List<NurseCertifications> findBySubject_Id(Long subjectId);
     @Query("SELECT nc FROM NurseCertifications nc ORDER BY nc.nurseInfo.id")
     List<NurseCertifications> findAllOrderByNurseId();
+
+    /**
+     * 根據護士ID查找所有證照
+     * @param nurseId 護士的ID
+     * @return 該護士的所有證照清單
+     */
+    List<NurseCertifications> findByNurseInfoId(Long nurseId);
+
+
 }

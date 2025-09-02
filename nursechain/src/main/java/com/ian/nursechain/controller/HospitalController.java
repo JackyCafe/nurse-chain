@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,7 +24,6 @@ import com.ian.nursechain.service.HospitalService;
 public class HospitalController {
     HospitalService hospitalService;
 
-    @Autowired
     public HospitalController(HospitalService service) {
         this.hospitalService = service;
     }

@@ -2,7 +2,6 @@ package com.ian.nursechain.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,7 +23,6 @@ public class NurseCertificationController {
 
     private final NurseCertificationService nurseCertificationService;
 
-    @Autowired
     public NurseCertificationController(NurseCertificationService nurseCertificationService) {
         this.nurseCertificationService = nurseCertificationService;
     }
@@ -49,9 +47,12 @@ public class NurseCertificationController {
     // 根據 ID 獲取單個護士證書
     @GetMapping("/{id}")
     public ResponseEntity<NurseCertificationResponseDTO> getNurseCertificationById(@PathVariable Long id) {
+        // NurseCertificationResponseDTO certification = nurseCertificationService.getNurseCertificationById(id);
         NurseCertificationResponseDTO certification = nurseCertificationService.getNurseCertificationById(id);
         return ResponseEntity.ok(certification); // 返回 200 OK
     }
+
+
 
     // 更新護士證書
     @PutMapping("/{id}")
@@ -67,5 +68,12 @@ public class NurseCertificationController {
     public ResponseEntity<Void> deleteNurseCertification(@PathVariable Long id) {
         nurseCertificationService.deleteNurseCertification(id);
         return ResponseEntity.noContent().build(); // 返回 204 No Content
+    }
+
+    // 根據護士ID獲取所有證書
+    @GetMapping("/nurse/{nurseId}")
+    public ResponseEntity<List<NurseCertificationResponseDTO>> getNurseCertificationsByNurseId(@PathVariable Long nurseId) {
+        List<NurseCertificationResponseDTO> certifications = nurseCertificationService.getNurseCertificationsByNurseId(nurseId);
+        return ResponseEntity.ok(certifications);
     }
 }

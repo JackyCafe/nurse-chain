@@ -1,6 +1,6 @@
-const BASE_API_URL = 'http://127.0.0.1:8081';
+const BASE_API_URL = 'http://125.229.250.48:8081';
 
-const apiUrl = `${BASE_API_URL}/api/nursecertifications`;
+const apiUrl = `${BASE_API_URL}/api/nursecertifications/nurse/36`;
 const subjectApiUrl = `${BASE_API_URL}/api/subjects`; // 獲取所有科目數據
 const blockchainApiUrl = `${BASE_API_URL}/api/blockchain/certify`; // 區塊鏈 Controller 端點
 
@@ -212,9 +212,9 @@ async function loadCertifications() {
             // 顯示累計積分和所需積分的提示
             showMessage(
                 `Current accumulated points: ${totalPoints.toFixed(1)} point。` +
-                `6 years should be taken ${requiredPoints} points，Need ${pointsNeeded.toFixed(1)} Points` +
-                `including professional 96 point，needs ${profrssionNeeded.toFixed(1)} points。\n` +
-                `quality/ethics/law at least 12 point，need ${OtherNeeded.toFixed(1)} points。\n`,
+                `6 years should be taken ${requiredPoints} points，Need ${pointsNeeded.toFixed(1)} Points. ` +
+                `including professional 96 point，needs ${profrssionNeeded.toFixed(1)} points ` +
+                `quality/ethics/law at least 12 point，need ${OtherNeeded.toFixed(1)} points `,
 
                 pointsNeeded <= 0 ? 'success' : 'info', // 如果達到目標，顯示成功訊息
                 true, // 追加訊息
